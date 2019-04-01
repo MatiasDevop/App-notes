@@ -1,9 +1,12 @@
 const express = require('express');
-const app = express();
 const path = require('path');
 const exphbs = require('express-handlebars');
 const methodOverride = require('method-override');
 const session = require('express-session');
+
+//Initializations
+const app = express();
+require('./database');
 
 //settings
 app.set('port', process.env.PORT || 3000);
@@ -27,9 +30,11 @@ app.use(session({
 //gloval variables
 
 // routes
-
+app.use(require('./routes/index'));
+app.use(require('./routes/notes'));
+app.use(require('./routes/users'));
 //static files
-
+app.use(express.static(path.join(__dirname, 'public')));
 //Server is listenning
 app.listen(app.get('port'), ()=>{
     console.log('server on port:', app.get('port'));
