@@ -17,11 +17,11 @@ app.engine('.hbs', exphbs({
     partialsDir: path.join(app.get('views'), 'partials'),
     extname: '.hbs'
 }));
-app.set('views engine', '.hbs');
+app.set('view engine', '.hbs');
 
 //Middlewares
 app.use(express.urlencoded({ extended: false })); // to recieve email and data
-app.use(methodOverride('_method'));
+app.use(methodOverride('_method')); //this is to hidden input use too
 app.use(session({
     secret: 'mysecretapp',
     resave: true,
