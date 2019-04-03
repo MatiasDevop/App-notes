@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const flash = require('connect-flash');
 
 const Note= require('../models/Note');// this is to use model
 
@@ -27,8 +28,8 @@ router.post('/notes/new-note', async (req, res) =>{
             const newNote = new Note({title, description});
             //console.log(newNote).then();
             await newNote.save(); //this await works to continiues with others tasks..
+            req.flash('success_msg', 'Note add successfully')
             res.redirect('/notes');
-        res.send('ok');
     }
     //console.log(req.body);
     //res.send('deliverid..');
@@ -47,13 +48,16 @@ router.get('/notes/edit/:id', async (req, res) =>{
 });
 router.put('/notes/edit-note/:id', async (req, res)=>{
     const {title, description} = req.body;
-   await Note.findByIdAndUpdate(req.params.id, {title, description});
+    await Note.findByIdAndUpdate(req.params.id, {title, description});
+   // to use flassh
+    req.flash('success_msg', 'Note updated successfully');
     res.redirect('/notes');
 });
 router.delete('/notes/delete/:id', async (req, res)=>{
     
        await Note.findByIdAndDelete(req.params.id);
-    //console.log(req.params.id);
+    //use the flash
+        req.flash('success_msg', 'Note delete successfully');
         res.redirect('/notes');
 });
 
