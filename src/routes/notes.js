@@ -3,12 +3,13 @@ const router = express.Router();
 const flash = require('connect-flash');
 
 const Note= require('../models/Note');// this is to use model
+const { isAuthenticated } = require('../helpers/auth');
 
-router.get('/notes/add', (req, res)=>{
+router.get('/notes/add', isAuthenticated, (req, res)=>{ //add is authenticated to use with user
     res.render('notes/new-notes');
 });
 
-router.post('/notes/new-note', async (req, res) =>{
+router.post('/notes/new-note', isAuthenticated, async (req, res) =>{
     const { title, description} = req.body;
     const errors = [];
     if(!title){
@@ -26,6 +27,7 @@ router.post('/notes/new-note', async (req, res) =>{
         console.log(errors);
     }else{
             const newNote = new Note({title, description});
+            newNote.user = req.user.id;// this is to control note by each user by id
             //console.log(newNote).then();
             await newNote.save(); //this await works to continiues with others tasks..
             req.flash('success_msg', 'Note add successfully')
@@ -35,25 +37,26 @@ router.post('/notes/new-note', async (req, res) =>{
     //res.send('deliverid..');
 });
 
-router.get('/notes', async (req, res)=>{
-
-    const notes = await Note.find().sort({date: 'desc' });
+router.get('/notes', isAuthenticated, async (req, res)=>{
+    //this new instruccion to getNotes by user.id only of him
+    const notes = await Note.find({user: req.user.id}).sort({date: 'desc'});
+   //const notes = await Note.find().sort({date: 'desc' });
     res.render('notes/all-notes',{ notes });
     //res.send('notes from DB');
 });
 
-router.get('/notes/edit/:id', async (req, res) =>{
+router.get('/notes/edit/:id', isAuthenticated, async (req, res) =>{
      const note = await Note.findById(req.params.id);  
     res.render('notes/edit-note', {note});
 });
-router.put('/notes/edit-note/:id', async (req, res)=>{
+router.put('/notes/edit-note/:id', isAuthenticated, async (req, res)=>{
     const {title, description} = req.body;
     await Note.findByIdAndUpdate(req.params.id, {title, description});
    // to use flassh
     req.flash('success_msg', 'Note updated successfully');
     res.redirect('/notes');
 });
-router.delete('/notes/delete/:id', async (req, res)=>{
+router.delete('/notes/delete/:id', isAuthenticated, async (req, res)=>{
     
        await Note.findByIdAndDelete(req.params.id);
     //use the flash

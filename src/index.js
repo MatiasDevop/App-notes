@@ -38,7 +38,8 @@ app.use(flash());
 app.use((req, res, next)=>{
     res.locals.success_msg = req.flash('success_msg');
     res.locals.error_msg = req.flash('error_msg');
-    res.locals.error = req.flash('error');
+    res.locals.error = req.flash('error');// Message to error when fill form
+    res.locals.user = req.user || null ;// to message to authenticated
     next();
 });
 // routes
@@ -50,4 +51,4 @@ app.use(express.static(path.join(__dirname, 'public')));
 //Server is listenning
 app.listen(app.get('port'), ()=>{
     console.log('server on port:', app.get('port'));
-})
+});
